@@ -1,0 +1,43 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          geo-fencing
+# Required-Start:    $local_fs $network $remote_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Load IPtables filtering rules if they exists
+### END INIT INFO
+
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+. /lib/init/vars.sh
+. /lib/lsb/init-functions
+
+do_start() {
+    if [ -e /opt/geo-fencing/iptables.rules ]; then
+            [ "$VERBOSE" != no ] && log_begin_msg "Loading IPtables filtering rules)"
+            /sbin/iptables-restore < /opt/geo-fencing/iptables.rules
+            ES=$?
+            [ "$VERBOSE" != no ] && log_end_msg $ES
+            return $ES
+    fi
+}
+
+case "$1" in
+start)
+    do_start
+    ;;
+restart|reload|force-reload)
+    echo "Error: argument '$1' not supported" >&2
+    exit 3
+    ;;
+stop)
+    ;;
+*)
+    echo "Usage: $0 start|stop" >&2
+    exit 3
+    ;;
+esac
+
+
